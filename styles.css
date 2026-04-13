@@ -1,0 +1,139 @@
+:root {
+  --bg: #0f1419;
+  --surface: #1a222d;
+  --surface-hover: #242e3d;
+  --text: #e8eef4;
+  --text-muted: #8b9cb0;
+  --accent: #3d9cf9;
+  --accent-dim: #2a6cb0;
+  --danger: #f07178;
+  --danger-hover: #e0555d;
+  --key-num: #2a3441;
+  --key-num-hover: #354252;
+  --radius: 14px;
+  --shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  font-family: "Outfit", system-ui, sans-serif;
+  background: radial-gradient(ellipse 120% 80% at 50% -20%, #1a3a5c 0%, transparent 50%),
+    var(--bg);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.app {
+  width: 100%;
+  max-width: 360px;
+}
+
+.app__header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.app__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.calculator {
+  background: var(--surface);
+  border-radius: calc(var(--radius) + 6px);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.display {
+  display: block;
+  width: 100%;
+  min-height: 88px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(1.75rem, 8vw, 2.25rem);
+  font-weight: 600;
+  text-align: right;
+  color: var(--text);
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  word-break: break-all;
+  line-height: 1.2;
+}
+
+.keys {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.key {
+  font-family: "Outfit", system-ui, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  padding: 18px 8px;
+  cursor: pointer;
+  color: var(--text);
+  background: var(--key-num);
+  transition: background 0.15s ease, transform 0.08s ease;
+}
+
+.key:active {
+  transform: scale(0.97);
+}
+
+.key:hover,
+.key:focus-visible {
+  background: var(--key-num-hover);
+  outline: none;
+}
+
+.key--accent {
+  background: var(--accent);
+  color: #fff;
+}
+
+.key--accent:hover,
+.key--accent:focus-visible {
+  background: #5aadfa;
+}
+
+.key--muted {
+  background: #243040;
+  color: var(--text-muted);
+}
+
+.key--muted:hover,
+.key--muted:focus-visible {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.key--danger {
+  background: rgba(240, 113, 120, 0.2);
+  color: var(--danger);
+}
+
+.key--danger:hover,
+.key--danger:focus-visible {
+  background: var(--danger);
+  color: #fff;
+}
