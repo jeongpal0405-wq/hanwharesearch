@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>심플 모던 계산기</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .calculator-card {
+            background-color: #1f2937;
+            border-radius: 2rem;
+            padding: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 340px;
+        }
+
+        .display-container {
+            text-align: right;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .previous-operand {
+            color: #9ca3af;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+
+        .current-operand {
+            color: #ffffff;
+            font-size: 2.5rem;
+            font-weight: 600;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+        }
+
+        button {
+            aspect-ratio: 1 / 1;
+            border-radius: 50%;
+            font-size: 1.25rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            outline: none;
+        }
+
+        button:active {
+            transform: scale(0.9);
+        }
+
+        .btn-gray { background-color: #4b5563; color: #fff; }
+        .btn-gray:hover { background-color: #6b7280; }
+
+        .btn-light-gray { background-color: #d1d5db; color: #111827; }
+        .btn-light-gray:hover { background-color: #e5e7eb; }
+
+        .btn-orange { background-color: #f59e0b; color: #fff; }
+        .btn-orange:hover { background-color: #fbbf24; }
+
+        .btn-equal {
+            grid-column: span 1;
+        }
+
+        .btn-zero {
+            grid-column: span 2;
+            aspect-ratio: auto;
+            border-radius: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator-card">
+        <div class="display-container">
+            <div id="previous-display" class="previous-operand"></div>
+            <div id="current-display" class="current-operand">0</div>
+        </div>
+
+        <div class="btn-grid">
+            <button class="btn-light-gray" onclick="clearDisplay()">AC</button>
+            <button class="btn-light-gray" onclick="deleteLast()">DEL</button>
+            <button class="btn-light-gray" onclick="appendOperator('%')">%</button>
+            <button class="btn-orange" onclick="appendOperator('÷')">÷</button>
+
+            <button class="btn-gray" onclick="appendNumber('7')">7</button>
+            <button class="btn-gray" onclick="appendNumber('8')">8</button>
+            <button class="btn-gray" onclick="appendNumber('9')">9</button>
+            <button class="btn-orange" onclick="appendOperator('×')">×</button>
+
+            <button class="btn-gray" onclick="appendNumber('4')">4</button>
+            <button class="btn-gray" onclick="appendNumber('5')">5</button>
+            <button class="btn-gray" onclick="appendNumber('6')">6</button>
+            <button class="btn-orange" onclick="appendOperator('-')">-</button>
+
+            <button class="btn-gray" onclick="appendNumber('1')">1</button>
+            <button class="btn-gray" onclick="appendNumber('2')">2</button>
+            <button class="btn-gray" onclick="appendNumber('3')">3</button>
+            <button class="btn-orange" onclick="appendOperator('+')">+</button>
+
+            <button class="btn-gray btn-zero" onclick="appendNumber('0')">0</button>
+            <button class="btn-gray" onclick="appendNumber('.')">.</button>
+            <button class="btn-orange btn-equal" onclick="compute()">=</button>
+        </div>
+    </div>
+
+    <script>
+        let currentOperand = '0';
+        let previousOperand = '';
+        let operator = null;
+
+        const currentDisplayElement = document.getElementById('current-display');
+        const previousDisplayElement = document.getElementById('previous-display');
+
+        function updateDisplay() {
+            currentDisplayElement.innerText = formatNumber(currentOperand);
+            if (operator != null) {
+                previousDisplayElement.innerText = `${formatNumber(previousOperand)} ${operator}`;
+            } else {
+                previousDisplayElement.innerText = '';
+            }
+        }
+
+        function formatNumber(number) {
+            if (number === '') return '';
+            const stringNumber = number.toString();
+            const integerDigits = parseFloat(stringNumber.split('.')[0]);
+            const decimalDigits = stringNumber.split('.')[1];
+            let integerDisplay;
+            if (isNaN(integerDigits)) {
+                integerDisplay = '';
+            } else {
+                integerDisplay = integerDigits.toLocaleString('ko-KR', { maximumFractionDigits: 0 });
+            }
+            if (decimalDigits != null) {
+                return `${integerDisplay}.${decimalDigits}`;
+            } else {
+                return integerDisplay;
+            }
+        }
+
+        function appendNumber(number) {
+            if (number === '.' && currentOperand.includes('.')) return;
+            if (currentOperand === '0' && number !== '.') {
+                currentOperand = number.toString();
+            } else {
+                currentOperand = currentOperand.toString() + number.toString();
+            }
+            updateDisplay();
+        }
+
+        function appendOperator(op) {
+            if (currentOperand === '') return;
+            if (previousOperand !== '') {
+                compute();
+            }
+            operator = op;
+            previousOperand = currentOperand;
+            currentOperand = '0';
+            updateDisplay();
+        }
+
+        function clearDisplay() {
+            currentOperand = '0';
+            previousOperand = '';
+            operator = null;
+            updateDisplay();
+        }
+
+        function deleteLast() {
+            if (currentOperand === '0') return;
+            currentOperand = currentOperand.toString().slice(0, -1);
+            if (currentOperand === '') currentOperand = '0';
+            updateDisplay();
+        }
+
+        function compute() {
+            let computation;
+            const prev = parseFloat(previousOperand);
+            const current = parseFloat(currentOperand);
+            if (isNaN(prev) || isNaN(current)) return;
+
+            switch (operator) {
+                case '+':
+                    computation = prev + current;
+                    break;
+                case '-':
+                    computation = prev - current;
+                    break;
+                case '×':
+                    computation = prev * current;
+                    break;
+                case '÷':
+                    if (current === 0) {
+                        alert("0으로 나눌 수 없습니다.");
+                        clearDisplay();
+                        return;
+                    }
+                    computation = prev / current;
+                    break;
+                case '%':
+                    computation = prev % current;
+                    break;
+                default:
+                    return;
+            }
+
+            currentOperand = computation.toString();
+            operator = null;
+            previousOperand = '';
+            updateDisplay();
+        }
+
+        // 키보드 지원
+        window.addEventListener('keydown', e => {
+            if (e.key >= 0 && e.key <= 9) appendNumber(e.key);
+            if (e.key === '.') appendNumber('.');
+            if (e.key === '=' || e.key === 'Enter') compute();
+            if (e.key === 'Backspace') deleteLast();
+            if (e.key === 'Escape') clearDisplay();
+            if (e.key === '+') appendOperator('+');
+            if (e.key === '-') appendOperator('-');
+            if (e.key === '*') appendOperator('×');
+            if (e.key === '/') {
+                e.preventDefault();
+                appendOperator('÷');
+            }
+        });
+
+        updateDisplay();
+    </script>
+</body>
+</html>
